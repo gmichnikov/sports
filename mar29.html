@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Google Sheets API Quickstart</title>
+    <title>Sports</title>
     <meta charset='utf-8' />
   </head>
   <body>
-    <p>Google Sheets API Quickstart</p>
+    <!-- <p>Google Sheets API Quickstart</p> -->
 
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="authorize-button" style="display: none;">Authorize</button>
@@ -111,13 +111,14 @@
           // spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
           range: 'Sheet1!A1:B4',
         }).then(function(response) {
+          appendPre('Hello Ringo');
           var range = response.result;
           if (range.values.length > 0) {
             // appendPre('Name, Major:');
             for (i = 0; i < range.values.length; i++) {
               var row = range.values[i];
               // Print columns A and E, which correspond to indices 0 and 4.
-              appendPre(row[0] + ' - ' + row[1]);
+              // appendPre(row[0] + ' - ' + row[1]);
             }
           } else {
             appendPre('No data found.');
