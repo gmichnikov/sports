@@ -109,15 +109,16 @@
         gapi.client.sheets.spreadsheets.values.get({
           spreadsheetId: '1LNDlyV1YxaEpC8lbqtYV4XVPleyO-RK5JvNENWzGxqA',
           // spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
-          range: 'Sheet1!A1:B4',
+          range: 'Sheet1!A6',
+          // range: 'Sheet1!A1:B4',
         }).then(function(response) {
-          appendPre('Hello Ringo');
           var range = response.result;
           if (range.values.length > 0) {
             // appendPre('Name, Major:');
             for (i = 0; i < range.values.length; i++) {
               var row = range.values[i];
               // Print columns A and E, which correspond to indices 0 and 4.
+              appendPre('Hello ' + row[0] + '!');
               // appendPre(row[0] + ' - ' + row[1]);
             }
           } else {
