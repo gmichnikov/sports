@@ -51,6 +51,7 @@
 
           // Handle the initial sign-in state.
           listMajors();
+          testWrite();
           updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
           authorizeButton.onclick = handleAuthClick;
           signoutButton.onclick = handleSignoutClick;
@@ -65,12 +66,12 @@
         if (isSignedIn) {
           authorizeButton.style.display = 'none';
           signoutButton.style.display = 'block';
-          listMajors();
-          testWrite();
+          // listMajors();
+          // testWrite();
         } else {
           authorizeButton.style.display = 'block';
           signoutButton.style.display = 'none';
-          listMajors();
+          // listMajors();
         }
       }
 
