@@ -50,8 +50,9 @@
           gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
 
           // Handle the initial sign-in state.
-          listMajors();
-          testWrite();
+          // listMajors();
+          listSchedule();
+          // testWrite();
           updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
           authorizeButton.onclick = handleAuthClick;
           signoutButton.onclick = handleSignoutClick;
@@ -128,6 +129,30 @@
           appendPre('Error2: ' + response.result.error.message);
         });
       }
+
+      /**
+       * See list of sports stuff
+       */
+      function listSchedule() {
+        gapi.client.sheets.spreadsheets.values.get({
+          spreadsheetId: '1BqJPlTdyANww_77Mz3MZWDDnnCKbZ4aHeLLN2v99xPg',
+          range: 'Combined!A1:F4052',
+        }).then(function(response) {
+          var range = response.result;
+          if (range.values.length > 0) {
+            appendPre('Order, Road Team, Home Team, Date, Sport, NYC?:');
+            for (i = 0; i < range.values.length; i++) {
+              var row = range.values[i];
+              appendPre(row[0] + ' ' + row[1] + ' ' + row[2] + ' ' + row[3] + ' ' + row[4] + ' ' + row[5] + ' ' + );
+            }
+          } else {
+            appendPre('No data found.');
+          }
+        }, function(response) {
+          appendPre('Error2: ' + response.result.error.message);
+        });
+      }
+
 
       function testWrite() {
         var params = {
