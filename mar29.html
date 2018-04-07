@@ -134,16 +134,32 @@
        * See list of sports stuff
        */
       function listSchedule() {
-        gapi.client.sheets.spreadsheets.values.get({
+        var params = {
           spreadsheetId: '1BqJPlTdyANww_77Mz3MZWDDnnCKbZ4aHeLLN2v99xPg',
           range: 'Combined!A1:F4052',
-        }).then(function(response) {
+          valueRenderOption: 'UNFORMATTED_VALUE'
+        };
+
+        var valueRangeBody = {
+          // TODO: Add desired properties to the request body.
+        };
+
+        gapi.client.sheets.spreadsheets.values.
+        get(params).
+        then(function(response) {
           var range = response.result;
+          var millisPerDay = 86400 * 1000;
           if (range.values.length > 0) {
-            appendPre('Order, Road Team, Home Team, Date, Sport, NYC?:');
+            appendPre('Road Team, Home Team, Date, Sport, NYC?:');
             for (i = 0; i < range.values.length; i++) {
               var row = range.values[i];
-              appendPre(row[0] + ' ' + row[1] + ' ' + row[2] + ' ' + row[3] + ' ' + row[4] + ' ' + row[5]);
+              var days  = Math.floor(row[3] - 25569) + 1;
+              var millis = days * millisPerDay;
+              // In next week
+              if (millis > Date.now() && millis <Date.now() + millisPerDay * 7 && row[5] == "Yes") {
+                // var display_date = date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear();
+                appendPre(row[1] + '@' + row[2] + ' ' + new Date(millis).toLocaleDateString("en-US") + ' ' + row[4] + ' ' + row[5]);
+              }
             }
           } else {
             appendPre('No data found.');
