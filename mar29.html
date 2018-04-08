@@ -5,13 +5,69 @@
     <meta charset='utf-8' />
   </head>
   <body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <!-- <p>Google Sheets API Quickstart</p> -->
+    <!-- <button id="trigger">Click me</button> -->
+    <!-- <p id="demo"></p> -->
+
+    <label for="location">Select a location</label>
+    <select name="location" id="location">
+      <option selected="selected">All</option>
+      <option>ATL</option>
+      <option>BOS</option>
+      <option>CHA</option>
+      <option>CHI</option>
+      <option>CIN</option>
+      <option>CLE</option>
+      <option>COL</option>
+      <option>DAL</option>
+      <option>DC</option>
+      <option>DEN</option>
+      <option>DET</option>
+      <option>HOU</option>
+      <option>IND</option>
+      <option>KC</option>
+      <option>LA</option>
+      <option>MEM</option>
+      <option>MIA</option>
+      <option>MIL</option>
+      <option>MIN</option>
+      <option>MON</option>
+      <option>NO</option>
+      <option>NYC</option>
+      <option>OKC</option>
+      <option>ORL</option>
+      <option>PHI</option>
+      <option>PHX</option>
+      <option>PIT</option>
+      <option>POR</option>
+      <option>SA</option>
+      <option>SD</option>
+      <option>SEA</option>
+      <option>SF</option>
+      <option>SLC</option>
+      <option>STL</option>
+      <option>TB</option>
+      <option>TOR</option>
+      <option>VAN</option>
+    </select>
+
+    <br>
+    <label for="sport">Select a sport</label>
+    <select name="sport" id="sport">
+      <option selected="selected">All</option>
+      <option>MLB</option>
+      <option>MLS</option>
+      <option>NBA</option>
+    </select>
 
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="authorize-button" style="display: none;">Authorize</button>
     <button id="signout-button" style="display: none;">Sign Out</button>
 
-    <pre id="content"></pre>
+    <pre id="content">
+      <table id="schedule"></table>
+    </pre>
 
     <script type="text/javascript">
       // Client ID and API key from the Developer Console
@@ -49,9 +105,19 @@
           // Listen for sign-in state changes.
           gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
 
+          $( "#location" ).change(function() {
+            listSchedule($('#location').val(), $('#sport').val());
+          });
+          $( "#sport" ).change(function() {
+            listSchedule($('#location').val(), $('#sport').val());
+          });
           // Handle the initial sign-in state.
           // listMajors();
-          listSchedule();
+          // $("#demo").html("Hello, World!");
+          // $("#trigger").hover(function() {
+          //   $("#demo").fadeToggle();
+          // });
+          // listSchedule();
           // testWrite();
           updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
           authorizeButton.onclick = handleAuthClick;
@@ -102,6 +168,11 @@
         pre.appendChild(textContent);
       }
 
+      function appendRow(row) {
+        var schedule = $('#schedule');
+        schedule.append(row);
+      }
+
       /**
        * Print the names and majors of students in a sample spreadsheet:
        * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
@@ -133,15 +204,11 @@
       /**
        * See list of sports stuff
        */
-      function listSchedule() {
+      function listSchedule(location, sport) {
         var params = {
           spreadsheetId: '1BqJPlTdyANww_77Mz3MZWDDnnCKbZ4aHeLLN2v99xPg',
           range: 'Combined!A1:F4052',
           valueRenderOption: 'UNFORMATTED_VALUE'
-        };
-
-        var valueRangeBody = {
-          // TODO: Add desired properties to the request body.
         };
 
         gapi.client.sheets.spreadsheets.values.
@@ -150,15 +217,22 @@
           var range = response.result;
           var millisPerDay = 86400 * 1000;
           if (range.values.length > 0) {
-            appendPre('Road Team, Home Team, Date, Sport, NYC?:');
+            $('#schedule').empty();
+            // appendPre('Road Team, Home Team, Date, Sport, Metro Area:');
+            appendRow('<tr><td>Road Team</td><td>Home Team</td><td>Date</td><td>Sport</td><td>Location</td></tr>');
             for (i = 0; i < range.values.length; i++) {
               var row = range.values[i];
               var days  = Math.floor(row[3] - 25569) + 1;
               var millis = days * millisPerDay;
               // In next week
-              if (millis > Date.now() && millis <Date.now() + millisPerDay * 7 && row[5] == "Yes") {
-                // var display_date = date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear();
-                appendPre(row[1] + '@' + row[2] + ' ' + new Date(millis).toLocaleDateString("en-US") + ' ' + row[4] + ' ' + row[5]);
+              if (millis > Date.now() && millis <Date.now() + millisPerDay * 7) {
+                if (location == "All" || row[5] == location) {
+                  if (sport == "All" || row[4] == sport) {
+                    // var display_date = date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear();
+                    // appendPre(row[1] + '@' + row[2] + ' ' + new Date(millis).toLocaleDateStding("en-US") + ' ' + row[4] + ' ' + row[5]);
+                    appendRow('<tr><td>' + row[1] + '</td><td>' + row[2] + '</td><td>' + new Date(millis).toLocaleDateString("en-US") + '</td><td>' + row[4] + '</td><td>'+row[5]+'</td></tr>');
+                  }
+                }
               }
             }
           } else {
