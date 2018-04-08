@@ -3,12 +3,14 @@
   <head>
     <title>Sports</title>
     <meta charset='utf-8' />
+    <style type = "text/css">
+       th {
+         font-weight: bold;
+       }
+    </style>
   </head>
   <body>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <!-- <p>Google Sheets API Quickstart</p> -->
-    <!-- <button id="trigger">Click me</button> -->
-    <!-- <p id="demo"></p> -->
 
     <label for="location">Select a location</label>
     <select name="location" id="location">
@@ -61,6 +63,17 @@
       <option>NBA</option>
     </select>
 
+    <br>
+    <label for="time">Show games over the next...</label>
+    <select name="time" id="time">
+      <option value="1">Day</option>
+      <option value="3">3 Days</option>
+      <option selected="selected" value="7">Week</option>
+      <option value="30">Month</option>
+      <option value="91">3 Months</option>
+      <option value="365">Year</option>
+    </select>
+
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="authorize-button" style="display: none;">Authorize</button>
     <button id="signout-button" style="display: none;">Sign Out</button>
@@ -106,19 +119,16 @@
           gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
 
           $( "#location" ).change(function() {
-            listSchedule($('#location').val(), $('#sport').val());
+            listSchedule($('#location').val(), $('#sport').val(), $('#time').val());
           });
           $( "#sport" ).change(function() {
-            listSchedule($('#location').val(), $('#sport').val());
+            listSchedule($('#location').val(), $('#sport').val(), $('#time').val());
           });
-          // Handle the initial sign-in state.
-          // listMajors();
-          // $("#demo").html("Hello, World!");
-          // $("#trigger").hover(function() {
-          //   $("#demo").fadeToggle();
-          // });
-          // listSchedule();
-          // testWrite();
+          $( "#time" ).change(function() {
+            listSchedule($('#location').val(), $('#sport').val(), $('#time').val());
+          });
+          listSchedule("All", "All", "7");
+
           updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
           authorizeButton.onclick = handleAuthClick;
           signoutButton.onclick = handleSignoutClick;
@@ -133,12 +143,9 @@
         if (isSignedIn) {
           authorizeButton.style.display = 'none';
           signoutButton.style.display = 'block';
-          // listMajors();
-          // testWrite();
         } else {
           authorizeButton.style.display = 'block';
           signoutButton.style.display = 'none';
-          // listMajors();
         }
       }
 
@@ -174,40 +181,12 @@
       }
 
       /**
-       * Print the names and majors of students in a sample spreadsheet:
-       * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-       */
-      function listMajors() {
-        gapi.client.sheets.spreadsheets.values.get({
-          spreadsheetId: '1LNDlyV1YxaEpC8lbqtYV4XVPleyO-RK5JvNENWzGxqA',
-          // spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
-          range: 'Sheet1!A6',
-          // range: 'Sheet1!A1:B4',
-        }).then(function(response) {
-          var range = response.result;
-          if (range.values.length > 0) {
-            // appendPre('Name, Major:');
-            for (i = 0; i < range.values.length; i++) {
-              var row = range.values[i];
-              // Print columns A and E, which correspond to indices 0 and 4.
-              appendPre('Hello ' + row[0] + '!');
-              // appendPre(row[0] + ' - ' + row[1]);
-            }
-          } else {
-            appendPre('No data found.');
-          }
-        }, function(response) {
-          appendPre('Error2: ' + response.result.error.message);
-        });
-      }
-
-      /**
        * See list of sports stuff
        */
-      function listSchedule(location, sport) {
+      function listSchedule(location, sport, numDays) {
         var params = {
           spreadsheetId: '1BqJPlTdyANww_77Mz3MZWDDnnCKbZ4aHeLLN2v99xPg',
-          range: 'Combined!A1:F4052',
+          range: 'Combined!A1:F',
           valueRenderOption: 'UNFORMATTED_VALUE'
         };
 
@@ -218,17 +197,15 @@
           var millisPerDay = 86400 * 1000;
           if (range.values.length > 0) {
             $('#schedule').empty();
-            // appendPre('Road Team, Home Team, Date, Sport, Metro Area:');
-            appendRow('<tr><td>Road Team</td><td>Home Team</td><td>Date</td><td>Sport</td><td>Location</td></tr>');
+            appendRow('<tr><th>Road Team</th><th>Home Team</th><th>Date</th><th>Sport</th><th>Location</th></tr>');
             for (i = 0; i < range.values.length; i++) {
               var row = range.values[i];
               var days  = Math.floor(row[3] - 25569) + 1;
               var millis = days * millisPerDay;
               // In next week
-              if (millis > Date.now() && millis <Date.now() + millisPerDay * 7) {
+              if (millis > Date.now() && millis < Date.now() + millisPerDay * parseInt(numDays)) {
                 if (location == "All" || row[5] == location) {
                   if (sport == "All" || row[4] == sport) {
-                    // var display_date = date.getMonth() + "-" + date.getDate() + "-" + date.getFullYear();
                     // appendPre(row[1] + '@' + row[2] + ' ' + new Date(millis).toLocaleDateStding("en-US") + ' ' + row[4] + ' ' + row[5]);
                     appendRow('<tr><td>' + row[1] + '</td><td>' + row[2] + '</td><td>' + new Date(millis).toLocaleDateString("en-US") + '</td><td>' + row[4] + '</td><td>'+row[5]+'</td></tr>');
                   }
@@ -243,24 +220,6 @@
         });
       }
 
-
-      function testWrite() {
-        var params = {
-          spreadsheetId: '1LNDlyV1YxaEpC8lbqtYV4XVPleyO-RK5JvNENWzGxqA',
-          // spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
-          range: 'Sheet1!E6',
-          valueInputOption: 'USER_ENTERED',
-        };
-        var body = {
-          "values": [["=A1", "?"]]
-        };
-        gapi.client.sheets.spreadsheets.values.update(params, body).then(function(response) {
-          var responseResult = response.result;
-          console.log(responseResult);
-        }, function(response) {
-          appendPre('Error1: ' + response.result.error.message);
-        });
-      }
     </script>
 
     <script async defer src="https://apis.google.com/js/api.js"
