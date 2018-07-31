@@ -16,6 +16,9 @@
        .NBA {
          color: green;
        }
+       .NFL {
+         color: orange;
+       }
        .oddRow {
          background-color: lightgray;
        }
@@ -29,6 +32,7 @@
       <option selected="selected">All</option>
       <option>ATL</option>
       <option>BOS</option>
+      <option>BUF</option>
       <option>CHA</option>
       <option>CHI</option>
       <option>CIN</option>
@@ -47,6 +51,7 @@
       <option>MIL</option>
       <option>MIN</option>
       <option>MON</option>
+      <option>NAS</option>
       <option>NO</option>
       <option>NYC</option>
       <option>OKC</option>
@@ -73,6 +78,7 @@
       <option>MLB</option>
       <option>MLS</option>
       <option>NBA</option>
+      <option>NFL</option>
     </select>
 
     <br>
@@ -231,6 +237,9 @@
                         break;
                       case "MLS":
                         sportEmoji = "⚽";
+                        break;
+                      case "NFL":
+                        sportEmoji = "🏈";
                         break;
                     }
                     // appendPre(row[1] + '@' + row[2] + ' ' + new Date(millis).toLocaleDateStding("en-US") + ' ' + row[4] + ' ' + row[5]);
